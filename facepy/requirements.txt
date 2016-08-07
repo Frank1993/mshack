@@ -1,0 +1,9 @@
+tarfile
+
+tensorflow
+
+numpy
+
+sklearn
+
+six

@@ -1,0 +1,9 @@
+.idea/
+.DS_Store
+.ipynb_checkpoints/
+/facepy/feature_extraction/inception_model/*
+*~
+
+tensorflow/*
+
+data/image_similar/*
