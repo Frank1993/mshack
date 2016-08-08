@@ -24,6 +24,7 @@ class Application(tornado.web.Application):
             img_dir='./imgs'    #这儿改成想要存图片的地址
         )
         super(Application, self).__init__(handlers, **settings)
+        self.maybe_create_dir()
 
     def maybe_create_dir(self):
         img_dir = self.settings.img_dir
