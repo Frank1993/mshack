@@ -11,6 +11,9 @@ import tornado.web
 
 from tornado.options import define, options
 
+
+from face_profile import get_profile
+
 define("port", default=8888, help="run on the given port", type=int)
 
 
@@ -42,7 +45,8 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def image_profile(self, image_path):
         #实现函数image_profile
-        return {'key' : image_path}
+
+        return get_profile(image_path)
 
     def find_simlilar_image(self, file_path, samegender=False):
         #实现函数find_simlilar_image
