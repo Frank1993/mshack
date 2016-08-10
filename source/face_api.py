@@ -30,7 +30,7 @@ class Application(tornado.web.Application):
         self.maybe_create_dir()
 
     def maybe_create_dir(self):
-        img_dir = self.settings.img_dir
+        img_dir = self.settings['img_dir']
         if not os.path.exists(img_dir):
             os.mkdir(img_dir)
 
@@ -44,7 +44,6 @@ class BaseHandler(tornado.web.RequestHandler):
         return hashlib.md5(str(uuid.uuid4())).hexdigest()
 
     def image_profile(self, image_path):
-        #实现函数image_profile
 
         return get_profile(image_path)
 
@@ -84,6 +83,7 @@ class MainHandler(BaseHandler):
                 self.set_status(500)
                 return self.write('save img error')
             retd = self.image_profile(filepath)
+            retd['imagePath'] = filepath
             self.write(tornado.escape.json_encode(retd))
         else:
             self.set_status(404)

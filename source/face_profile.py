@@ -21,18 +21,18 @@ def get_profile(image):
     skin_score = skin_svm.predict(features)[0]
 
     if glasses_result == 0:
-        result["glasses"] = u"无"
+        result["glasses"] = "无"
     else:
-        result["glasses"] = u"有"
+        result["glasses"] = "有"
 
     result['face_score'] = fa_score_result
 
     if skin_score ==-1:
-        result["skin"] = u"偏黑"
+        result["skin"] = "偏黑"
     elif skin_score == 0:
-        result["skin"] = u"正常"
+        result["skin"] = "正常"
     else:
-        result["skin"] = u"偏白"
+        result["skin"] = "偏白"
 
     return result
 

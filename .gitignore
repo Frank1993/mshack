@@ -6,3 +6,6 @@
 tensorflow/*
 
 data/image_similar/*
+*/imgs/*
+*.pyc
+
