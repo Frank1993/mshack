@@ -4,32 +4,42 @@ import sys
 
 sys.path.append('../facepy/feature_extraction/')
 
-#from facepy..image import extract_features
-
-import extract_features
-import pandas
+from image import extract_features
 import fnmatch
 import os
+import numpy as np
+
+from sklearn.neighbors import LSHForest
+
+image_similar_dir = os.path.abspath('../data/image_similar/')
+
+similar_image_paths = []
+for file in os.listdir(image_similar_dir):
+    if fnmatch.fnmatch(file, '*.jpg'):
+        similar_image_paths.append(image_similar_dir +'/'+ file)
 
 
-#读取excel 文件并合并
+similar_image_paths.sort()
 
-similar_image_path = os.path.abspath('../data/image_similar/')
-excel=pandas.read_excel(similar_image_path+'/1.xlsx')
+# extract features
+#similar_image_features = extract_features(similar_image_paths)
+#np.save('../data/model/similar_image.pickle',similar_image_features)
 
-for i in xrange(2,17):
-    excel=excel.append(pandas.read_excel(similar_image_path+'/%s.xlsx'%i),ignore_index=True)
+# load features
 
-data=pandas.DataFrame({'id':excel[u'学号'],'name':excel[u'姓名'],'class':excel[u'班号'],'gender':excel[u'性别']})
+similar_image_features = np.load('../data/model/similar_image.pickle.npy')
 
-def get_image_for_people(row):
-    idOfPeople=row['id']
-    imageName = None
-    for file in os.listdir(similar_image_path):
-        if fnmatch.fnmatch(file, '%s*.*'%idOfPeople):
-            imageName=file
-            break
-    return imageName
+lshf = LSHForest(random_state=42)
+lshf.fit(similar_image_features)
+def find_similar_image(image_path):
+    image_feature = extract_features([image_path])
+    distances, indices = lshf.kneighbors(image_feature, n_neighbors=3)
+    return [similar_image_paths[i] for i in indices[0]][1:]
 
 
-print data
+if __name__ == '__main__':
+
+    image_path = image_similar_dir + '/2015110420陈美玉.jpg'
+    similar_images = find_similar_image(image_path)
+
+    print similar_images

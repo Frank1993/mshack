@@ -14,8 +14,11 @@ from tornado.options import define, options
 
 from face_profile import get_profile
 
+from sim_image import find_similar_image
+
 define("port", default=8888, help="run on the given port", type=int)
 
+image_dir = os.path.abspath('../data/receive_image')
 
 class Application(tornado.web.Application):
     def __init__(self):
@@ -24,7 +27,7 @@ class Application(tornado.web.Application):
         ]
         settings = dict(
             debug=True,
-            img_dir='./imgs'    #这儿改成想要存图片的地址
+            img_dir=image_dir    #这儿改成想要存图片的地址
         )
         super(Application, self).__init__(handlers, **settings)
         self.maybe_create_dir()
@@ -47,9 +50,9 @@ class BaseHandler(tornado.web.RequestHandler):
 
         return get_profile(image_path)
 
-    def find_simlilar_image(self, file_path, samegender=False):
+    def find_simlilar_image(self, file_path):
         #实现函数find_simlilar_image
-        return file_path+'.new'
+        return find_similar_image(file_path)
 
 
 class MainHandler(BaseHandler):
@@ -83,6 +86,7 @@ class MainHandler(BaseHandler):
                 self.set_status(500)
                 return self.write('save img error')
             retd = self.image_profile(filepath)
+            print 'save image to '+ filepath
             retd['imagePath'] = filepath
             self.write(tornado.escape.json_encode(retd))
         else:
@@ -96,14 +100,12 @@ class MainHandler(BaseHandler):
             if not dinfo:
                 raise ValueError
             imgpath = dinfo.get('imgpath')
-            samegender = dinfo.get('samegender')
-            if not (imgpath and samegender):
+            if not imgpath:
                 raise ValueError
-            samegender = False if samegender in [0, '0'] or samegender.lower() == 'false' else True
         except:
             self.set_status(404)
             return self.write('argument error')
-        newpath = self.find_simlilar_image(imgpath, samegender)
+        newpath = self.find_simlilar_image(imgpath)
         self.write({'newimg': newpath})
 
 
