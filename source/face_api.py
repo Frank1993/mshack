@@ -23,6 +23,7 @@ image_dir = os.path.abspath('../data/receive_image')
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
+            (r"/images/(.*)", tornado.web.StaticFileHandler, {'path':r"../data/receive_image/"}),
             (r"/", MainHandler),
         ]
         settings = dict(
@@ -61,7 +62,8 @@ class MainHandler(BaseHandler):
     #curl -d '{"samegender":"0","imgpath":"fdsfasfsd"}' http://localhost:8888/?action=getSimilar
 
     def get(self):
-        self.set_status(404)
+        img = self.get_query_argument('img')
+        self.send_image(img)
 
     def post(self):
         action = self.get_query_argument('action')
@@ -69,16 +71,21 @@ class MainHandler(BaseHandler):
             self.receive_img()
         elif action == 'getSimilar':
             self.get_similar_img()
+        #elif action.endwith(".jpg"):
+            #self.send_image(action)
         else:
             self.set_status(404)
 
+    def send_image(self,imageName):
+        imagePath = self.get_img_path(imageName)
+        self.write({"imageName":imagePath})
     def receive_img(self):
         print self.request.files
         http_file_list = self.request.files.get('img')
         if http_file_list:
             f = http_file_list[0]
             filename = self.gen_unique_name()
-            filepath = self.get_img_path(filename)
+            filepath = self.get_img_path(filename)+".jpg"
             try:
                 with open(filepath, 'wb') as up:
                     up.write(f.body)

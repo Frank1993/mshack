@@ -42,4 +42,5 @@ if __name__ == '__main__':
     image_path = image_similar_dir + '/2015110420陈美玉.jpg'
     similar_images = find_similar_image(image_path)
 
-    print similar_images
+    for image in similar_images:
+        print image
